@@ -56,6 +56,8 @@ class Model {
             return Error("Length of inputs must be equal to length of output.");
         }
 
+        let loss = 0;
+
         for (let i = 0; i < inputs.length; i++) {
 
             let x = inputs[i];
@@ -63,15 +65,23 @@ class Model {
 
             let prediction = this.predict(x).copy();
 
+            // calculate the output layer error
             let final_error = this.err(y, prediction);
 
+            loss += Math.pow(final_error.values[0][0], 2);
+
+            // loop over the hidden and input layers
             for (let j = this.layers.length - 2; j >= 0; j--) {
 
+                // current layer
                 let layer = this.layers[j];
+                // next layer
                 let next_layer = this.layers[j + 1];
 
+                // copy the error
                 let hidden_error = final_error.copy();
 
+                // layer_error * next_layer_derivative * layer_data
                 let gradient = Matrix.map(next_layer.data, next_layer.activationFunction.df);
                 gradient.scalar(hidden_error);
                 gradient.scalar(this.learning_rate);
@@ -85,6 +95,8 @@ class Model {
             }
 
         }
+
+        return (Math.sqrt(loss) / inputs.length);
 
     }
 

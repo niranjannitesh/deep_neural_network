@@ -1,12 +1,12 @@
 const Model = require('./Model');
 const n_Error = require('./Error');
 const Layer = require('./Layer');
-const { sigmoid } = require('./Activation');
+const { tanh, sigmoid } = require('./Activation');
 
-const nnet = new Model(n_Error.meanSquaredError, 0.2);
+const nnet = new Model(n_Error.meanSquaredError, 0.5);
 
 nnet.addLayer(new Layer(2, sigmoid));
-nnet.addLayer(new Layer(8, sigmoid));
+nnet.addLayer(new Layer(8, tanh));
 nnet.addLayer(new Layer(1, sigmoid));
 
 
@@ -29,7 +29,7 @@ let training_data = [{
 ];
 
 
-for (let i = 0; i < 10000; i++) {
+for (let i = 0; i < 1500; i++) {
   let random = training_data[Math.floor(Math.random() * training_data.length)];
   nnet.train([random.inputs], [random.outputs]);
 }
