@@ -8,6 +8,7 @@ A simple Deep Neural Network Library (Not Optimized but gets simple works done).
 - [ ] Add ReLU
 - [ ] MNIST Example
 - [ ] Model Saving and Restoring
+- [ ] Add Support for Evolutionary Computing (Genetic Algorithms)
 
 ## Example
 
