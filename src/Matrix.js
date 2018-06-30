@@ -7,13 +7,7 @@ class Matrix {
     constructor(rows, cols) {
         this.rows = rows;
         this.cols = cols;
-        this.values = [];
-        for (let i = 0; i < this.rows; i++) {
-            this.values[i] = [];
-            for (let j = 0; j < this.cols; j++) {
-                this.values[i][j] = Math.random() / 5;
-            }
-        }
+        this.values = Array(this.rows).fill().map(() => Array(this.cols).fill(0));
         return this;
     }
 
@@ -26,15 +20,19 @@ class Matrix {
      */
     add(_matrix) {
         if (this.rows != _matrix.rows || this.cols != _matrix.cols) {
-            throw Error('Rows and cols of matrix must match.');
+            throw Error("Rows and cols of matrix must match.");
         }
         this.map((val, i, j) => val + _matrix.values[i][j]);
         return this;
     }
 
+    randomize() {
+        return this.map(e => Math.random() * 2 - 1);
+    }
+
     subtract(_matrix) {
         if (this.rows != _matrix.rows || this.cols != _matrix.cols) {
-            throw Error('Rows and cols of matrix must match.');
+            throw Error("Rows and cols of matrix must match.");
         }
         this.map((val, i, j) => val - _matrix.values[i][j]);
         return this;
@@ -46,7 +44,7 @@ class Matrix {
      */
     static subtract(matrix1, matrix2) {
         if (matrix1.rows !== matrix2.rows || matrix1.cols !== matrix2.cols) {
-            throw Error('Rows and cols of matrix must match.');
+            throw Error("Rows and cols of matrix must match.");
         }
         let result = new Matrix(matrix1.rows, matrix1.cols);
         result.map((val, i, j) => matrix1.values[i][j] - matrix2.values[i][j]);
@@ -60,7 +58,7 @@ class Matrix {
         if (n instanceof Matrix) {
             this.map((val, i, j) => val * n.values[i][j]);
         } else {
-            this.map((val) => val * n);
+            this.map(val => val * n);
         }
         return this;
     }
@@ -71,14 +69,14 @@ class Matrix {
      */
     static dot(matrix1, matrix2) {
         if (matrix1.cols != matrix2.rows) {
-            throw Error('Cols of the matrix1 must me equal to rows of matrix2');
+            throw Error("Cols of the matrix1 must me equal to rows of matrix2");
         }
         let _m = new Matrix(matrix1.rows, matrix2.cols);
         for (let i = 0; i < _m.rows; i++) {
             for (let j = 0; j < _m.cols; j++) {
                 let sum = 0;
                 for (let r = 0; r < matrix1.cols; r++) {
-                    sum += (matrix1.values[i][r] * matrix2.values[r][j]);
+                    sum += matrix1.values[i][r] * matrix2.values[r][j];
                 }
                 _m.values[i][j] = sum;
             }
@@ -98,12 +96,12 @@ class Matrix {
     copy() {
         let m = new Matrix(this.rows, this.cols);
         for (let i = 0; i < this.rows; i++) {
-          for (let j = 0; j < this.cols; j++) {
-            m.values[i][j] = this.values[i][j];
-          }
+            for (let j = 0; j < this.cols; j++) {
+                m.values[i][j] = this.values[i][j];
+            }
         }
         return m;
-      }
+    }
 
     map(f) {
         for (let i = 0; i < this.rows; i++) {
@@ -120,14 +118,20 @@ class Matrix {
      * @param {Function} f
      */
     static map(matrix, f) {
-        return new Matrix(matrix.rows, matrix.cols)
-      .map((e, i, j) => f(matrix.values[i][j], i, j));
+        return new Matrix(matrix.rows, matrix.cols).map((e, i, j) =>
+            f(matrix.values[i][j], i, j)
+        );
+    }
+
+    toArray() {
+        let arr = [];
+        this.map(x => arr.push(x));
+        return arr;
     }
 
     print() {
         console.log(this.values);
     }
-
 }
 
 module.exports = Matrix;
