@@ -19,7 +19,7 @@ nnet.addLayer(new Layer(2, sigmoid));
 nnet.addLayer(new Layer(8, sigmoid));
 nnet.addLayer(new Layer(1, sigmoid));
 
-nnet.train([inputs], [outputs]);
+nnet.train(inputs, outputs);
 
 nnet.predict(input).print();
 ```
