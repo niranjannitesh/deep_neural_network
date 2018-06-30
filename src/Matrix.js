@@ -1,5 +1,4 @@
 class Matrix {
-
     /**
      * @param { Number } rows
      * @param { Number } cols

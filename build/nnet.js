@@ -1,3 +1,53 @@
+class ActivationFunction {
+  /**
+   * @param {Function} f
+   * @param {Function} df
+   */
+  constructor(f, df) {
+    this.f = f;
+    this.df = df;
+  }
+}
+
+const sigmoid = new ActivationFunction(
+  x => 1 / (1 + Math.exp(-x)),
+  y => y * (1 - y)
+);
+
+const tanh = new ActivationFunction(x => Math.tanh(x), y => 1 - y * y);
+
+class n_Error {
+  /**
+   *
+   * @param {Matrix} target
+   * @param {Matrix} prediction
+   */
+  static meanSquaredError(target, prediction) {
+    return target.subtract(prediction);
+  }
+}
+
+class Layer {
+  /**
+   * Create a new Layer
+   * @param {number} input
+   * @param {ActivationFunction} activationFunction
+   */
+  constructor(nodes, activationFunction) {
+    this.nodes = nodes;
+    this.activationFunction = activationFunction;
+    this.data = new Matrix(nodes, 1);
+    this.weights;
+    this.bias;
+  }
+
+  propagate(input) {
+    // TODO: Check input size
+    this.data = input;
+    return Matrix.dot(this.weights, input);
+  }
+}
+
 class Matrix {
   /**
    * @param { Number } rows
@@ -6,13 +56,9 @@ class Matrix {
   constructor(rows, cols) {
     this.rows = rows;
     this.cols = cols;
-    this.values = [];
-    for (let i = 0; i < this.rows; i++) {
-      this.values[i] = [];
-      for (let j = 0; j < this.cols; j++) {
-        this.values[i][j] = Math.random() / 5;
-      }
-    }
+    this.values = Array(this.rows)
+      .fill()
+      .map(() => Array(this.cols).fill(0));
     return this;
   }
 
@@ -29,6 +75,10 @@ class Matrix {
     }
     this.map((val, i, j) => val + _matrix.values[i][j]);
     return this;
+  }
+
+  randomize() {
+    return this.map(e => Math.random() * 2 - 1);
   }
 
   subtract(_matrix) {
@@ -124,58 +174,14 @@ class Matrix {
     );
   }
 
+  toArray() {
+    let arr = [];
+    this.map(x => arr.push(x));
+    return arr;
+  }
+
   print() {
     console.log(this.values);
-  }
-}
-
-class ActivationFunction {
-  /**
-   * @param {Function} f
-   * @param {Function} df
-   */
-  constructor(f, df) {
-    this.f = f;
-    this.df = df;
-  }
-}
-
-const sigmoid = new ActivationFunction(
-  x => 1 / (1 + Math.exp(-x)),
-  y => y * (1 - y)
-);
-
-const tanh = new ActivationFunction(x => Math.tanh(x), y => 1 - y * y);
-
-class n_Error {
-  /**
-   *
-   * @param {Matrix} target
-   * @param {Matrix} prediction
-   */
-  static meanSquaredError(target, prediction) {
-    return target.subtract(prediction);
-  }
-}
-
-class Layer {
-  /**
-   * Create a new Layer
-   * @param {number} input
-   * @param {ActivationFunction} activationFunction
-   */
-  constructor(nodes, activationFunction) {
-    this.nodes = nodes;
-    this.activationFunction = activationFunction;
-    this.data = new Matrix(nodes, 1);
-    this.weights;
-    this.bias;
-  }
-
-  propagate(input) {
-    // TODO: Check input size
-    this.data = input;
-    return Matrix.dot(this.weights, input);
   }
 }
 
@@ -199,8 +205,8 @@ class Model {
     if (this.layers.length >= 1) {
       let prev = this.layers[this.layers.length - 1];
       // Intialize the weights
-      prev.weights = new Matrix(layer.nodes, prev.nodes);
-      layer.bias = new Matrix(layer.nodes, 1);
+      prev.weights = new Matrix(layer.nodes, prev.nodes).randomize();
+      layer.bias = new Matrix(layer.nodes, 1).randomize();
     }
     this.layers.push(layer);
   }
@@ -224,13 +230,15 @@ class Model {
 
   /**
    * Train the network
-   * @param {Array} inputs Arrays of inputs
-   * @param {Array} outputs Arrays of outputs
+   * @param {Array} inputs Array of inputs
+   * @param {Array} outputs Array of outputs
    */
   train(inputs, outputs) {
     if (inputs.length !== outputs.length) {
       return Error("Length of inputs must be equal to length of output.");
     }
+
+    let total_error = new Matrix(this.layers[this.layers.length - 1].nodes, 1);
 
     for (let i = 0; i < inputs.length; i++) {
       let x = inputs[i];
@@ -239,6 +247,7 @@ class Model {
       let prediction = this.predict(x).copy();
 
       let final_error = this.err(y, prediction);
+      total_error.add(final_error);
 
       for (let j = this.layers.length - 2; j >= 0; j--) {
         let layer = this.layers[j];
@@ -263,5 +272,11 @@ class Model {
         );
       }
     }
+    let e = 0;
+    total_error.map(x => {
+      e += Math.abs(x) / total_error.rows;
+      return x;
+    });
+    return e;
   }
 }

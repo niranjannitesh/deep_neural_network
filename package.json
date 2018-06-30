@@ -1,0 +1,13 @@
+{
+  "name": "nnet",
+  "version": "1.0.1",
+  "description": "A simple deep neural network library",
+  "main": "index.js",
+  "repository": "https://github.com/niteshkumarniranjan/deep_neural_network.git",
+  "author": "Nitesh Kumar Niranjan <niteshkumarniranjan@github.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1"
+  }
+}
