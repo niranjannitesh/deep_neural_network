@@ -31,8 +31,7 @@ let training_data = [{
 
 for (let i = 0; i < 1650; i++) {
   let random = training_data[Math.floor(Math.random() * training_data.length)];
-  let error = nnet.train([random.inputs], [random.outputs]);
-  console.log(error);
+  nnet.train(random.inputs, random.outputs);
 }
 
 nnet.predict([0, 0]).print();
